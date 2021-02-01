@@ -20,6 +20,7 @@ import httplib2
 ui_class = uic.loadUiType("resources/main.ui")
 
 coin_list = [
+    "-",
     "BTC", "ETH", "XRP", "XLM", "EOS", "BCH", "KLAY",
     "LTC", "TRX", "LINK", "DOT", "LUNA", "ADA", "BSV",
     "XTZ", "ATOM", "QTUM", "IOTA", "ETC", "SKLAY", "NEO",
@@ -226,12 +227,15 @@ class WindowClass(Q.QMainWindow, ui_class[0]):
         self.pushButton.clicked.connect(self.button_pushed)
 
     def button_pushed(self):
+        if self.coin == "-":
+            return
+
         # 정보 불러오기
         self.access_token = self.lineEdit.text()
         self.secret_key = self.lineEdit_2.text()
         self.buyPrice = int(self.lineEdit_3.text())
         self.sellPrice = int(self.lineEdit_4.text())
-        self.checked = self.checkBox.ischecked()
+        self.checked = self.checkBox.isChecked()
 
         if not (self.access_token and self.secret_key and self.buyPrice and self.sellPrice and self.coin and self.checked):
             return
@@ -244,7 +248,10 @@ class WindowClass(Q.QMainWindow, ui_class[0]):
 
     def set_coin(self):
         self.coin = self.comboBox.currentText()
-        currentPrice = int(get_coin_price(self.coin))
+        if self.coin != "-":
+            currentPrice = int(get_coin_price(self.coin))
+        else:
+            currentPrice = 0
 
         self.coinsetter1 = setCoin()
         self.coinsetter1.text_out.connect(self.lineEdit_3.setText)

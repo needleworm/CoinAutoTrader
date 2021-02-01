@@ -212,6 +212,9 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="text">
+    <string>0</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_4">
    <property name="geometry">
@@ -221,6 +224,9 @@
      <width>151</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>0</string>
    </property>
   </widget>
  </widget>
