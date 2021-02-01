@@ -231,6 +231,10 @@ class WindowClass(Q.QMainWindow, ui_class[0]):
         self.secret_key = self.lineEdit_2.text()
         self.buyPrice = int(self.lineEdit_3.text())
         self.sellPrice = int(self.lineEdit_4.text())
+        self.checked = self.checkBox.ischecked()
+
+        if not (self.access_token and self.secret_key and self.buyPrice and self.sellPrice and self.coin and self.checked):
+            return
 
         # 멀티스레드로 오토트레이딩
         self.Bot = autoTrader(self.access_token, self.secret_key, self.coin, self.buyPrice, self.sellPrice)
