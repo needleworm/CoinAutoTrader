@@ -176,13 +176,15 @@ class autoTrader(QThread):
                 message, jsn, lastBuyWon = buy_all(access_token, secret_key, self.coin, self.buyPrice)
                 if message:
                     self.text_out.emit(message)
-
+                    QtGui.QGuiApplication.processEvents()
             elif coinPrice > self.sellPrice:
                 message, jsn, lastSellWon = sell_all(access_token, secret_key, self.coin, self.sellPrice)
                 if message:
                     self.text_out.emit(message)
+                    QtGui.QGuiApplication.processEvents()
                 if lastSellWon and lastBuyWon:
                     self.text_out.emit("Income : " + str(lastSellWon - lastBuyWon) + "￦\n\n")
+                    QtGui.QGuiApplication.processEvents()
             time.sleep(0.5)
 
 
@@ -194,6 +196,7 @@ class SetCoin(QThread):
 
     def change(self, price):
         self.text_out.emit(price)
+        QtGui.QGuiApplication.processEvents()
 
 
 class WindowClass(Q.QMainWindow, ui_class):
