@@ -17,7 +17,7 @@ import json
 import time
 import httplib2
 
-ui_class = uic.loadUiType("resources/main.ui")
+ui_class = uic.loadUiType("./main.ui")
 
 coin_list = [
     "-",
@@ -87,6 +87,7 @@ def get_balance(coin, access_token, secret_key):
 
 
 def get_coin_price(coinTicker):
+    coinTicker = coinTicker.lower()
     url = "https://api.coinone.co.kr/ticker/?format=json&currency=" + coinTicker
     http = httplib2.Http()
     _, response = http.request(url, "GET")
@@ -95,6 +96,7 @@ def get_coin_price(coinTicker):
 
 
 def buy_coin(access_token, secret_key, price, qty, coin):
+    coin = coin.lower()
     payload = {
         "access_token": access_token,
         "price": str(price),
@@ -105,6 +107,7 @@ def buy_coin(access_token, secret_key, price, qty, coin):
 
 
 def sell_coin(access_token, secret_key, price, qty, coin):
+    coin = coin.lower()
     payload = {
         "access_token": access_token,
         "price": str(price),
@@ -115,6 +118,7 @@ def sell_coin(access_token, secret_key, price, qty, coin):
 
 
 def buy_all(access_token, secret_key, coin, maxPrice=None):
+    coin = coin.lower()
     krw = get_balance("krw", access_token, secret_key)
     price = get_coin_price(coin)
     if price > maxPrice:
@@ -126,11 +130,12 @@ def buy_all(access_token, secret_key, coin, maxPrice=None):
     splt = str(qty).split(".")
     qtyStr = splt[0] + "." + splt[-1][:6]
 
-    return "Coin Limit Buy\n" + str(time.ctime()) + "\nPrice: " + str(price) + "\tQuantity: " + qtyStr + "\n" + \
+    return "TRY> Coin Limit Buy\t" + str(time.ctime()) + "\nPrice: " + str(price) + "\tQuantity: " + qtyStr + "\n", \
            buy_coin(access_token, secret_key, price, qty, coin), price * qty
 
 
 def sell_all(access_token, secret_key, coin, minPrice=None):
+    coin = coin.lower()
     qty = get_balance(coin, access_token, secret_key)
     qty -= qty % 0.0001
     price = get_coin_price(coin)
@@ -141,26 +146,8 @@ def sell_all(access_token, secret_key, coin, minPrice=None):
     splt = str(qty).split(".")
     qtyStr = splt[0] + "." + splt[-1][:6]
 
-    return "Coin Limit Sell\n" + str(time.ctime()) + "\nPrice: " + str(price) + "\tQuantity: " + qtyStr + "\n", \
+    return "TRY> Coin Limit Sell\t" + str(time.ctime()) + "\nPrice: " + str(price) + "\tQuantity: " + qtyStr + "\n", \
         sell_coin(access_token, secret_key, price, qty, coin), price * qty
-
-
-def auto_trading(access_token, secret_key, coin, buyAt, sellAt):
-    while True:
-        lastBuyPrice = buyAt
-        coinPrice = get_coin_price(coin)
-        if  coinPrice < buyAt:
-            message, jsn, lastBuyPrice = buy_all(access_token, secret_key, coin, buyAt)
-            if message:
-                print(message)
-
-        elif coinPrice > sellAt:
-            message, jsn, lastSellPrice = sell_all(access_token, secret_key, coin, sellAt)
-            if message:
-                print(message)
-            if lastSellPrice and lastBuyPrice:
-                print("Income : " + str(lastSellPrice - lastBuyPrice) + "￦")
-        time.sleep(0.5)
 
 
 class autoTrader(QThread):
@@ -177,34 +164,36 @@ class autoTrader(QThread):
     def run(self):
         self.text_out.emit("Auto Trading Bot Initiated.")
 
-        self.text_out.emit("Target Coin : " + self.coin.upper())
+        self.text_out.emit("Target Coin : " + self.coin + "\n")
         while True:
             QtGui.QGuiApplication.processEvents()
-            lastBuyPrice = self.buyPrice
+            lastBuyWon = None
+            lastSellWon = None
+
             coinPrice = get_coin_price(self.coin)
             if coinPrice < self.buyPrice:
-                message, jsn, lastBuyPrice = buy_all(access_token, secret_key, self.coin, self.buyPrice)
+                message, jsn, lastBuyWon = buy_all(access_token, secret_key, self.coin, self.buyPrice)
                 if message:
                     self.text_out.emit(message)
 
             elif coinPrice > self.sellPrice:
-                message, jsn, lastSellPrice = sell_all(access_token, secret_key, self.coin, self.sellPrice)
+                message, jsn, lastSellWon = sell_all(access_token, secret_key, self.coin, self.sellPrice)
                 if message:
                     self.text_out.emit(message)
-                if lastSellPrice and lastBuyPrice:
-                    self.text_out.emit("Income : " + str(lastSellPrice - lastBuyPrice) + "￦")
-            time.sleep(1)
+                if lastSellWon and lastBuyWon:
+                    self.text_out.emit("Income : " + str(lastSellWon - lastBuyWon) + "￦\n\n")
+            time.sleep(0.5)
 
 
-class setCoin(QThread):
+class SetCoin(QThread):
     text_out = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
 
     def change(self, price):
-        print(price)
         self.text_out.emit(price)
+
 
 class WindowClass(Q.QMainWindow, ui_class[0]):
     def __init__(self):
@@ -253,13 +242,13 @@ class WindowClass(Q.QMainWindow, ui_class[0]):
         else:
             currentPrice = 0
 
-        self.coinsetter1 = setCoin()
+        self.coinsetter1 = SetCoin()
         self.coinsetter1.text_out.connect(self.lineEdit_3.setText)
-        self.coinsetter1.change(str(int(currentPrice * 0.995)))
+        self.coinsetter1.change(str(int(currentPrice * 0.996)))
 
-        self.coinsetter2 = setCoin()
+        self.coinsetter2 = SetCoin()
         self.coinsetter2.text_out.connect(self.lineEdit_4.setText)
-        self.coinsetter2.change(str(int(currentPrice * 1.005)))
+        self.coinsetter2.change(str(int(currentPrice * 1.004)))
 
 
 if __name__ == "__main__":

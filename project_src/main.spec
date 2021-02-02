@@ -6,7 +6,7 @@ block_cipher = None
 a = Analysis(['main.py'],
              pathex=['C:\\Users\\bhban\\Desktop\\coinauto\\project_src'],
              binaries=[],
-             datas=[('resources/main.ui', 'resources'),
+             datas=[('main.ui', '.'),
                     ('resource_rc.py', '.'),
                     ('resources/logo.png', 'resources'),
                     ('resources/favicon.ico', 'resources')
