@@ -17,7 +17,8 @@ import json
 import time
 import httplib2
 
-ui_class = uic.loadUiType("./main.ui")
+from ui import Ui_Dialog
+ui_class = Ui_Dialog
 
 coin_list = [
     "-",
@@ -195,7 +196,7 @@ class SetCoin(QThread):
         self.text_out.emit(price)
 
 
-class WindowClass(Q.QMainWindow, ui_class[0]):
+class WindowClass(Q.QMainWindow, ui_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
