@@ -169,13 +169,14 @@ class autoTrader(QThread):
             lastSellWon = None
 
             coinPrice = get_coin_price(self.coin)
+            print(coinPrice)
             if coinPrice < self.buyPrice:
-                message, jsn, lastBuyWon = buy_all(access_token, secret_key, self.coin, self.buyPrice)
+                message, jsn, lastBuyWon = buy_all(self.access_token, self.secret_key, self.coin, self.buyPrice)
                 if message:
                     self.text_out.emit(message)
                     QtGui.QGuiApplication.processEvents()
             elif coinPrice > self.sellPrice:
-                message, jsn, lastSellWon = sell_all(access_token, secret_key, self.coin, self.sellPrice)
+                message, jsn, lastSellWon = sell_all(self.access_token, self.secret_key, self.coin, self.sellPrice)
                 if message:
                     self.text_out.emit(message)
                     QtGui.QGuiApplication.processEvents()
