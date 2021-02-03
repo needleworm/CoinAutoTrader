@@ -47,9 +47,6 @@ coin_list = [
     "STAKE", "TOMOE", "UMA"
 ]
 
-access_token = "c237f2cd-46f8-4ea5-b0f5-b342381d3a95"
-secret_key = "67a6bcf6-4b1d-4f2f-a07c-4e40c01748b3"
-
 
 def get_encoded_payload(payload):
     payload['nonce'] = int(time.time() * 1000)
