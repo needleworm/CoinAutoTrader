@@ -15,7 +15,10 @@ import hashlib
 import hmac
 import json
 import time
-import httplib2
+import requests
+
+
+doing_job = False
 
 from ui import Ui_Dialog
 ui_class = Ui_Dialog
@@ -62,7 +65,7 @@ def get_signature(encoded_payload, secret_key):
 
 
 def get_response(action, payload, secret_key):
-    url = '{}{}'.format('https://api.coinone.co.kr/', action)
+    url = 'https://api.coinone.co.kr/' + action
 
     encoded_payload = get_encoded_payload(payload)
 
@@ -72,14 +75,13 @@ def get_response(action, payload, secret_key):
         'X-COINONE-SIGNATURE': get_signature(encoded_payload, secret_key),
     }
 
-    http = httplib2.Http()
-    response, content = http.request(url, 'POST', body=encoded_payload, headers=headers)
+    response = requests.post(url, encoded_payload, headers=headers).text
 
-    return content
+    return json.loads(response)
 
 
 def get_balance(coin, access_token, secret_key):
-    response = json.loads(get_response('v2/account/balance', {'access_token': access_token}, secret_key))
+    response = get_response('v2/account/balance', {'access_token': access_token}, secret_key)
     coin = float(response[coin]["balance"])
     return coin
 
@@ -87,10 +89,9 @@ def get_balance(coin, access_token, secret_key):
 def get_coin_price(coinTicker):
     coinTicker = coinTicker.lower()
     url = "https://api.coinone.co.kr/ticker/?format=json&currency=" + coinTicker
-    http = httplib2.Http()
-    _, response = http.request(url, "GET")
-    response = json.loads(response)
-    return float(response["last"])
+    response = requests.get(url).text
+    price = json.loads(response)["last"]
+    return float(price)
 
 
 def buy_coin(access_token, secret_key, price, qty, coin):
@@ -101,7 +102,7 @@ def buy_coin(access_token, secret_key, price, qty, coin):
         "qty": str(qty),
         "currency": coin
     }
-    return json.loads(get_response("v2/order/limit_buy", payload, secret_key))
+    return get_response("v2/order/limit_buy", payload, secret_key)
 
 
 def sell_coin(access_token, secret_key, price, qty, coin):
@@ -112,7 +113,7 @@ def sell_coin(access_token, secret_key, price, qty, coin):
         "qty": str(qty),
         "currency": coin
     }
-    return json.loads(get_response("v2/order/limit_sell", payload, secret_key))
+    return get_response("v2/order/limit_sell", payload, secret_key)
 
 
 def buy_all(access_token, secret_key, coin, maxPrice=None):
@@ -160,29 +161,43 @@ class autoTrader(QThread):
         self.sellPrice = sellPrice
 
     def run(self):
-        self.text_out.emit("Auto Trading Bot Initiated.")
+        global doing_job
+        if doing_job:
+            self.text_out.emit("Auto Trading Bot Initiated.")
 
-        self.text_out.emit("Target Coin : " + self.coin + "\n")
-        while True:
+            self.text_out.emit("Target Coin : " + self.coin + "\n")
+            latest_message = ""
+        else:
+            self.text_out.emit("Stop Auto Trading.\n\n")
+        while doing_job:
             QtGui.QGuiApplication.processEvents()
             lastBuyWon = None
             lastSellWon = None
 
             coinPrice = get_coin_price(self.coin)
-            print(coinPrice)
             if coinPrice < self.buyPrice:
                 message, jsn, lastBuyWon = buy_all(self.access_token, self.secret_key, self.coin, self.buyPrice)
-                if message:
+                if not message:
+                    continue
+                elif message[:20] == latest_message:
+                    continue
+                elif message:
                     self.text_out.emit(message)
+                    latest_message = message[:20]
                     QtGui.QGuiApplication.processEvents()
             elif coinPrice > self.sellPrice:
                 message, jsn, lastSellWon = sell_all(self.access_token, self.secret_key, self.coin, self.sellPrice)
-                if message:
+                if not message:
+                    continue
+                elif message[:20] == latest_message:
+                    continue
+                elif message:
                     self.text_out.emit(message)
                     QtGui.QGuiApplication.processEvents()
-                if lastSellWon and lastBuyWon:
-                    self.text_out.emit("Income : " + str(lastSellWon - lastBuyWon) + "￦\n\n")
-                    QtGui.QGuiApplication.processEvents()
+                    latest_message = message[:20]
+                    if lastSellWon and lastBuyWon:
+                        self.text_out.emit("Income : " + str(lastSellWon - lastBuyWon) + "￦\n\n")
+                        QtGui.QGuiApplication.processEvents()
             time.sleep(0.5)
 
 
@@ -201,6 +216,8 @@ class WindowClass(Q.QMainWindow, ui_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        self.doing_job = False
 
         self.coin = ""
         self.access_token = ""
@@ -222,8 +239,8 @@ class WindowClass(Q.QMainWindow, ui_class):
             return
 
         # 정보 불러오기
-        self.access_token = self.lineEdit.text()
-        self.secret_key = self.lineEdit_2.text()
+        self.access_token = self.lineEdit.text().strip()
+        self.secret_key = self.lineEdit_2.text().strip()
         self.buyPrice = int(self.lineEdit_3.text())
         self.sellPrice = int(self.lineEdit_4.text())
         self.checked = self.checkBox.isChecked()
@@ -231,6 +248,12 @@ class WindowClass(Q.QMainWindow, ui_class):
         if not (self.access_token and self.secret_key and self.buyPrice and self.sellPrice and self.coin and self.checked):
             return
 
+        global doing_job
+        doing_job = not doing_job
+        if doing_job:
+            self.pushButton.setText("Stop Auto Trading")
+        else:
+            self.pushButton.setText("Start Auto Trading")
         # 멀티스레드로 오토트레이딩
         self.Bot = autoTrader(self.access_token, self.secret_key, self.coin, self.buyPrice, self.sellPrice)
         self.Bot.text_out.connect(self.textBrowser.append)
@@ -258,3 +281,4 @@ if __name__ == "__main__":
     myWindow = WindowClass()
     myWindow.show()
     app.exec_()
+    sys.exit(app.exec_)
