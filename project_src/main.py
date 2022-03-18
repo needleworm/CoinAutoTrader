@@ -25,29 +25,28 @@ ui_class = Ui_Dialog
 
 coin_list = [
     "-",
-    "BTC", "ETH", "XRP", "XLM", "EOS", "BCH", "KLAY",
-    "LTC", "TRX", "LINK", "DOT", "LUNA", "ADA", "BSV",
-    "XTZ", "ATOM", "QTUM", "IOTA", "ETC", "SKLAY", "NEO",
-    "AIP", "ASTA", "MCH", "BMP", "FCR", "MNR", "TOROCUS",
-    "VIVI", "RUSH", "MSB", "LBXC", "ORC", "NFUP", "TRIX",
-    "ISR", "1INCH", "PICA", "HANDY", "BAAS", "ARPA", "DVI",
-    "MIR", "LMCH", "KSP", "MOV", "TOM", "AXL", "ZIL", "CBANK",
-    "OMG", "MTS", "FLETA", "TEMCO", "ASM", "PIB", "PURE",
-    "REN", "DUCATO", "TMTG", "QTBK", "XPN", "GOM2", "TMC",
-    "REDI", "SNX", "SXP", "BEL", "QTCON", "EXE", "DRC",
-    "STPL", "BORA", "ISDT", "DRM", "AMO", "WIKEN", "HIBS",
-    "SUSHI", "HINT", "UOS", "PSC", "ABL", "IBP", "BFC",
-    "COMP", "GRT", "BNA", "KRT", "RNX", "PROM", "EGG", "AVAX",
-    "AAVE", "DAD", "FTT", "KDAG", "LINA", "TRCL", "DON", "SRM",
-    "CRV", "DODO", "BCHA", "KAVA", "ANKR", "KNC", "CAMP", "ZRX",
-    "SIX", "KVI", "IOTX", "BTT", "JST", "ALPHA", "BAT", "AOA",
-    "SUN", "ONX", "STPT", "IPX", "PCI", "TIP", "INJ", "BASIC",
-    "DATA", "BTG", "FET", "CTSI", "VSYS", "MVC", "PXL", "MATIC",
-    "HUM", "KAI", "DIA", "ONT", "BAL", "ORBS", "COS", "SOC",
-    "KSC", "BOT", "OBSR", "MBL", "DVX", "CBK", "SHOW", "CKB",
-    "AXS", "LUA", "BAND", "OGN", "BNT", "BZRX", "CLB", "DMG",
-    "FRONT", "GAS", "GET", "HARD", "KSM", "MTA", "NEST", "ONG",
-    "STAKE", "TOMOE", "UMA"
+    "BTC", "ETH", "XRP", "XLM", "LUNA", "KLAY","ATOM", "SOL", "DOT",
+    "TRX", "ETC", "ADA", "FIL", "DOGE", "XLM", "LTC", "EOS", "LINK",
+    "BCH", "XTZ", "SKLAY", "QTUM", "NEO", "IOTA", "BSV", "UNI",
+    "1INCH", 'AAVE', 'ABL', "ACH", 'AIP', 'ALPHA', 'AMO', "ANC",
+    'ANKR', 'AOA', "APENFT", "ARPA", 'ASM', 'ASTA', "ATT", "AUCTION", 
+    'AVAX', 'AXL', 'AXS', 'BAAS', 'BAL', 'BAND', 'BASIC', 'BAT',
+    'BEL', "BIOT", "BIT", "BMP", 'BORA', 'BTG', 'BTT', 'BZRX',
+    'CAMP', 'CBANK', 'CBK', 'CKB', "CELEB", 'CLB', "CLV", 'COMP',
+    'COS', "CRO", "CRU", 'CRV', 'CTSI', 'DAD', "DAO",  'DATA', 'DIA',
+    'DODO', 'DON', 'DRM', 'DVI', 'DVX', 'EGG', "ERN", 'EXE', 'FET',
+    "FIS", "FLOW", 'FRONT', "FTM", 'FTT', "GALA", 'GAS', 'GOM2', 'GRT',
+    'HANDY', 'HARD', 'HIBS', 'HINT', "HOT", 'HUM',
+    'IBP', "ICX", "IDV", "ILV", 'INJ', 'IOTX', 'IPX', 'ISDT', 'ISR',
+    "ITAMCUBE",  'JST', 'KAI', 'KAVA', 'KDAG', 'KNC', 'KRT', 'KSC', 'KSM', 'KSP',
+    "LBL", 'LBXC', "LDN", 'LINA', "LIT", 'LUA', "LZM", "MAMA", "MAP", 'MATIC',
+    'MBL', 'MCH', "MEGA", "MEV", 'MIR', "MLK", 'MNR', 'MOV', 'MSB', 'MTA', 'MTS',
+    'MVC', 'NEST', 'NFUP', 'OGN', 'OMG', 'ONG', 'ONT', 'ONX', 'ORBS', 'ORC', 'PCI',
+    'PHA', 'PIB', 'PICA', 'POD', 'PROM', 'PURE', 'PXL', 'QTBK', 'QTCON',
+    'REDI', 'REN', 'RUSH', 'SAND', 'SHOW','SIX', 'SKU', 'SNX', 'SOBA', 'SOC', 'SPA', 
+    'SRM', 'STAKE', 'STND' 'STPL', 'STPT', 'SUN', 'SUSHI', 'SXP',
+    'TEMCO', 'TEN', 'TIP', 'TMC', 'TMTG', 'TOM', 'TOMOE', 'TOROCUS', 'TRCL', 'TRIX',
+    'UMA', 'UOS', 'VSYS', 'WIKEN', 'XPN', 'ZIL', 'ZRX'
 ]
 
 
@@ -116,9 +115,9 @@ def sell_coin(access_token, secret_key, price, qty, coin):
     return get_response("v2/order/limit_sell", payload, secret_key)
 
 
-def buy_all(access_token, secret_key, coin, maxPrice=None):
+def buy_all(access_token, secret_key, coin, maxPrice):
     coin = coin.lower()
-    krw = get_balance("krw", access_token, secret_key)
+    krw = get_balance("krw", access_token, secret_key) * 0.998
     price = get_coin_price(coin)
     if price > maxPrice:
         return None, None, None
@@ -133,7 +132,7 @@ def buy_all(access_token, secret_key, coin, maxPrice=None):
            buy_coin(access_token, secret_key, price, qty, coin), price * qty
 
 
-def sell_all(access_token, secret_key, coin, minPrice=None):
+def sell_all(access_token, secret_key, coin, minPrice):
     coin = coin.lower()
     qty = get_balance(coin, access_token, secret_key)
     qty -= qty % 0.0001
@@ -241,8 +240,8 @@ class WindowClass(Q.QMainWindow, ui_class):
         # 정보 불러오기
         self.access_token = self.lineEdit.text().strip()
         self.secret_key = self.lineEdit_2.text().strip()
-        self.buyPrice = int(self.lineEdit_3.text())
-        self.sellPrice = int(self.lineEdit_4.text())
+        self.buyPrice = float(self.lineEdit_3.text())
+        self.sellPrice = float(self.lineEdit_4.text())
         self.checked = self.checkBox.isChecked()
 
         if not (self.access_token and self.secret_key and self.buyPrice and self.sellPrice and self.coin and self.checked):
@@ -263,17 +262,17 @@ class WindowClass(Q.QMainWindow, ui_class):
     def set_coin(self):
         self.coin = self.comboBox.currentText()
         if self.coin != "-":
-            currentPrice = int(get_coin_price(self.coin))
+            currentPrice = get_coin_price(self.coin)
         else:
             currentPrice = 0
 
         self.coinsetter1 = SetCoin()
         self.coinsetter1.text_out.connect(self.lineEdit_3.setText)
-        self.coinsetter1.change(str(int(currentPrice * 0.996)))
+        self.coinsetter1.change(str(int(currentPrice * 0.997* 1000) / 1000))
 
         self.coinsetter2 = SetCoin()
         self.coinsetter2.text_out.connect(self.lineEdit_4.setText)
-        self.coinsetter2.change(str(int(currentPrice * 1.004)))
+        self.coinsetter2.change(str(int(currentPrice * 1.003 * 1000) / 1000))
 
 
 if __name__ == "__main__":
