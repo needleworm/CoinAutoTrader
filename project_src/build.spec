@@ -8,7 +8,7 @@ a = Analysis(['CoinAuto.py'],
              datas=[('ui.py', '.'),
                     ('resource_rc.py', '.'),
                     ('resources/logo.png', 'resources'),
-                    ('resources/favicon.ico', 'resources')
+                    ('resources/icon.ico', 'resources')
                     ],
              hiddenimports=[],
              hookspath=[],
@@ -34,4 +34,4 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=False,
-          icon='.\\resources\\favicon.ico')
+          icon='.\\resources\\icon.ico')
