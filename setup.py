@@ -11,9 +11,9 @@ APP = ['CoinAuto.py']
 DATA_FILES = []
 OPTIONS = {
     "includes": [
-        "PyQt5.QtGUi",
-        "PyQt5.QtWidgets",
-        "PyQt5.QtCore",
+        "PyQt6.QtGUi",
+        "PyQt6.QtWidgets",
+        "PyQt6.QtCore",
         "base64",
         "hashlib",
         "hmac",

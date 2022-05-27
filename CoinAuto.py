@@ -7,9 +7,9 @@ https://github.com/needleworm
 
 import sys
 #from PyQt5 import uic
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets as Q
-from PyQt5.QtCore import *
+from PyQt6 import QtGui
+from PyQt6 import QtWidgets as Q
+from PyQt6.QtCore import *
 import base64
 import hashlib
 import hmac
@@ -299,5 +299,5 @@ if __name__ == "__main__":
     app = Q.QApplication(sys.argv)
     myWindow = WindowClass()
     myWindow.show()
-    app.exec_()
-    sys.exit(app.exec_)
+    app.exec()
+    sys.exit(app.exec)
